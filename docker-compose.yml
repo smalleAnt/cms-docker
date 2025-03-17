@@ -1,0 +1,56 @@
+version: '3'
+services:
+
+  tengine:
+    image: modstart/tengine:1.0.0
+    ports:
+      - "20080:80"
+    volumes:
+      - "./docker_config/tengine.conf:/etc/nginx/nginx.conf"
+      - "../modstart:/data/website/modstart:rw"
+    links:
+      - php56
+    networks:
+      - ms_network
+
+  php56:
+    image: modstart/php56:1.1.0
+    volumes:
+      - "../modstart:/data/website/modstart:rw"
+    links:
+      - mysql
+    networks:
+      - ms_network
+
+  supervisor_php56:
+    image: modstart/supervisor_php56:1.0.0
+    volumes:
+      - "../modstart:/data/website/modstart:rw"
+      - "./cron.d:/etc/cron.d:rw"
+      - "./supervisord.d:/etc/supervisord.d:rw"
+    links:
+      - mysql
+    networks:
+      - ms_network
+
+  mysql:
+    image: mysql:5.6.29
+    environment:
+      MYSQL_ROOT_PASSWORD: "root123456"
+    volumes:
+      - "./docker_config/mysql_init.sql:/docker-entrypoint-initdb.d/setup.sql"
+      - "./data/mysql:/var/lib/mysql"
+    ports:
+      - "23306:3306"
+    networks:
+      - ms_network
+
+networks:
+  ms_network:
+    name: ms_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.30.30.0/24
+          gateway: 172.30.30.1
