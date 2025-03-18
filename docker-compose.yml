@@ -4,7 +4,7 @@ services:
   tengine:
     image: modstart/tengine:1.0.0
     ports:
-      - "20080:80"
+      - "80:80"
     volumes:
       - "./docker_config/tengine.conf:/etc/nginx/nginx.conf"
       - "../modstart:/data/website/modstart:rw"
@@ -41,7 +41,7 @@ services:
       - "./docker_config/mysql_init.sql:/docker-entrypoint-initdb.d/setup.sql"
       - "./data/mysql:/var/lib/mysql"
     ports:
-      - "23306:3306"
+      - "3306:3306"
     networks:
       - ms_network
 
